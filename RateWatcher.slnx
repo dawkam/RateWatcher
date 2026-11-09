@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="src/RateWatcher/RateWatcher.csproj" Id="34dd211c-6b7d-4232-8721-d238ab778881" />
+  <Project Path="tests/RateWatcher.Tests/RateWatcher.Tests.csproj" Id="649da029-7a9d-4c0a-a6ba-d15693314b47" />
+</Solution>
