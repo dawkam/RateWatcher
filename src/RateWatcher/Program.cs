@@ -1,6 +1,9 @@
 using RateWatcher;
 
 var builder = Host.CreateApplicationBuilder(args);
+builder.Services
+    .AddHttpClient<NBPClient>(client =>client.BaseAddress = new Uri("https://api.nbp.pl/api/exchangerates/rates/"))
+    .AddStandardResilienceHandler();
 builder.Services.AddHostedService<Worker>();
 
 builder.Services.AddOptions<RateWatcherOptions>().Bind(builder.Configuration.GetSection(nameof(RateWatcherOptions)));
