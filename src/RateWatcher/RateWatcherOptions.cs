@@ -8,6 +8,6 @@ namespace RateWatcher
     {
         public string[] Currency { get; set; } = [];
         public int RefreshInterval { get; set; }
-        public float ValueChangeThreshold { get; set; }
+        public decimal ValueChangeThreshold { get; set; }
     }
 }

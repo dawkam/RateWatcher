@@ -10,6 +10,6 @@ public class NBPData
 public class NBPRate
 {
     public string no { get; set; }
-    public string effectiveDate { get; set; }
-    public float mid { get; set; }
+    public DateOnly effectiveDate { get; set; }
+    public decimal mid { get; set; }
 }
