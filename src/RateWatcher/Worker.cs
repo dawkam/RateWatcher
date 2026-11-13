@@ -29,7 +29,6 @@ namespace RateWatcher
                     }
                 }
                 await Task.Delay(optionsCopy.RefreshInterval, stoppingToken);
-
             }
         }
 
