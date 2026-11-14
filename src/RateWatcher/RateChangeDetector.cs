@@ -11,7 +11,7 @@ namespace RateWatcher
         {
             decimal newValue = data.rates[0].mid;
             var optionsCopy = options.Value;
-            var result = (false, "", 0m);
+            var result = (false, data.code, 0m);
 
             if (!currentRate.TryGetValue(data.code, out decimal currentValue))
             {

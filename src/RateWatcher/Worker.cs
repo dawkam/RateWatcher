@@ -4,9 +4,6 @@ namespace RateWatcher
 {
     public class Worker(IOptions<RateWatcherOptions> options, IServiceScopeFactory seriveScope, ILogger<Worker> logger) : BackgroundService
     {
-
-
-
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             var optionsCopy = options.Value;
@@ -30,8 +27,6 @@ namespace RateWatcher
                 await Task.Delay(optionsCopy.RefreshInterval, stoppingToken);
             }
         }
-
-
 
         private void PintRate(string currencyCode, decimal currencyValue)
         {
