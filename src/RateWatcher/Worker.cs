@@ -4,27 +4,27 @@ namespace RateWatcher
 {
     public class Worker(IOptions<RateWatcherOptions> options, IServiceScopeFactory seriveScope, ILogger<Worker> logger) : BackgroundService
     {
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        protected override async Task ExecuteAsync(CancellationToken cancellationToken)
         {
             var optionsCopy = options.Value;
-            while (!stoppingToken.IsCancellationRequested)
+            while (!cancellationToken.IsCancellationRequested)
             {
                 var scope = seriveScope.CreateScope();
                 var rateChangeDetector = scope.ServiceProvider.GetRequiredService<RateChangeDetector>();
                 var nbp = scope.ServiceProvider.GetRequiredService<NBPClient>();
                 foreach (var currency in options.Value.Currency)
                 {
-                    var data = await nbp.GetCurrentRate(currency, stoppingToken);
+                    var data = await nbp.GetCurrentRate(currency, cancellationToken);
                     if (data != null)
                     {
-                        (bool isChanged, string code, decimal value) = rateChangeDetector.CheckRateChange(data);
+                        (bool isChanged, string code, decimal value) = await rateChangeDetector.CheckRateChange(data, cancellationToken);
                         if (isChanged)
                         {
                             this.PintRate(code, value);
                         }
                     }
                 }
-                await Task.Delay(optionsCopy.RefreshInterval, stoppingToken);
+                await Task.Delay(optionsCopy.RefreshInterval, cancellationToken);
             }
         }
 

@@ -5,7 +5,9 @@ builder.Services
     .AddHttpClient<NBPClient>(client => client.BaseAddress = new Uri("https://api.nbp.pl/api/exchangerates/rates/"))
     .AddStandardResilienceHandler();
 builder.Services.AddSingleton<RateChangeDetector>();
+builder.Services.AddSingleton<FileRateController>();
 builder.Services.AddHostedService<Worker>();
+builder.Services.AddSingleton(TimeProvider.System);
 
 builder.Services.AddOptions<RateWatcherOptions>().Bind(builder.Configuration.GetSection(nameof(RateWatcherOptions)));
 

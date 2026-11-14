@@ -3,25 +3,37 @@
 namespace RateWatcher
 {
 
-    public class RateChangeDetector(IOptions<RateWatcherOptions> options)
+    public class RateChangeDetector(IOptions<RateWatcherOptions> options, IServiceScopeFactory seriveScope, FileRateController fileRateController, TimeProvider timeProvider)
     {
-        Dictionary<string, decimal> currentRate = new();
+        Dictionary<string, decimal> currentRate = [];
 
-        public (bool, string, decimal) CheckRateChange(NBPData data)
+        public async Task<(bool, string, decimal)> CheckRateChange(NBPData data, CancellationToken cancellationToken)
         {
             decimal newValue = data.rates[0].mid;
             var optionsCopy = options.Value;
             var result = (false, data.code, 0m);
 
+            if (currentRate.Count == 0)
+            {
+                currentRate = await fileRateController.GetNewestRate(cancellationToken);
+            }
+
+
             if (!currentRate.TryGetValue(data.code, out decimal currentValue))
             {
                 currentRate.Add(data.code, newValue);
                 result = (true, data.code, newValue);
+                var date = DateOnly.FromDateTime(timeProvider.GetUtcNow().UtcDateTime);
+                await fileRateController.SaveNewRateAsync(data.code, newValue, date, cancellationToken);
+
             }
             else if (IsChangeDetected(currentValue, newValue, optionsCopy.ValueChangeThreshold))
             {
                 currentRate[data.code] = newValue;
                 result = (true, data.code, newValue);
+                var date = DateOnly.FromDateTime(timeProvider.GetUtcNow().UtcDateTime);
+                await fileRateController.SaveNewRateAsync(data.code, newValue, date, cancellationToken);
+
             }
 
             return result;
