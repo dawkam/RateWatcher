@@ -1,5 +1,4 @@
 using Microsoft.Extensions.Options;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace RateWatcher
 {
