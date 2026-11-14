@@ -14,7 +14,7 @@ namespace RateWatcher
         private readonly string path = Path.Combine(AppContext.BaseDirectory, "RateHistory.csv");
 
 
-        Dictionary<string, List<(decimal value, DateOnly date)>> fileData = new();
+        Dictionary<string, List<(decimal value, DateOnly date)>> fileData = [];
 
 
 
@@ -40,18 +40,29 @@ namespace RateWatcher
                 {
                     continue;
                 }
-                fileData.TryGetValue(columns[0], out var date);
-                date?.Add((value, date: addedOn));
+
+                if (fileData.TryGetValue(columns[0], out var data))
+                {
+                    fileData[columns[0]].AddRange(data);
+                }
+                else
+                {
+                    var newList = new List<(decimal value, DateOnly date)>() {
+                        (value, addedOn)
+                    };
+                    fileData.Add(columns[0], newList);
+                    logger.LogInformation(message: $"Saved Before {columns[0]} : {value}");
+                }
             }
         }
 
         public async Task<Dictionary<string, decimal>> GetNewestRate(CancellationToken cancellationToken)
         {
             Dictionary<string, decimal> result = [];
-            if (fileData == null)
+            if (fileData.Count == 0)
             {
                 await GetSavedRate(cancellationToken);
-                if (fileData == null)
+                if (fileData.Count == 0)
                     return [];
             }
             var optionsCopy = options.Value;
