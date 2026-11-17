@@ -7,13 +7,14 @@ namespace RateWatcher
         protected override async Task ExecuteAsync(CancellationToken cancellationToken)
         {
             var optionsCopy = options.Value;
+            var lastRates = await fileRateController.GetNewestRate(cancellationToken);
+            rateChangeDetector.InitLastRates(lastRates);
+
             while (!cancellationToken.IsCancellationRequested)
             {
                 try
                 {
                     var scope = seriveScope.CreateAsyncScope();
-                    var lastRates = await fileRateController.GetNewestRate(cancellationToken);
-                    rateChangeDetector.InitLastRates(lastRates);
 
                     var nbp = scope.ServiceProvider.GetRequiredService<NBPClient>();
                     foreach (var currency in options.Value.Currency)
