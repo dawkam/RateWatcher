@@ -15,6 +15,7 @@ namespace RateWatcher
             catch (Exception e) when (!cancellationToken.IsCancellationRequested)
             {
                 logger.LogError(e, "Failed to open file");
+                return;
             }
 
             while (!cancellationToken.IsCancellationRequested)
