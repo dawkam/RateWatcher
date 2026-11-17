@@ -41,8 +41,8 @@ namespace RateWatcher
                     {
                         logger.LogError(e, "Failed to process rate for {Currency}", currency);
                     }
-                    await Task.Delay(optionsCopy.RefreshInterval, cancellationToken);
                 }
+                await Task.Delay(optionsCopy.RefreshInterval, cancellationToken);
             }
         }
 
