@@ -20,20 +20,20 @@ namespace RateWatcher.Tests
                 }]
             };
 
-            var result = rateChangeDetector.CheckRateChange(nbpData);
+            var result = rateChangeDetector.IsRateChange(nbpData);
 
-            Assert.Equal((true, code, value), result);
+            Assert.True(result);
         }
 
         [Theory]
-        [InlineData(3.5, "USD", 0.001, false, 0)]
-        [InlineData(3.6, "USD", 0.001, true, 3.6)]
-        [InlineData(3.501, "USD", 0.001, false, 0)]
-        [InlineData(3.501, "USD", 0.01, false, 0)]
-        [InlineData(4, "EUR", 0.001, false, 0)]
-        [InlineData(4.1, "EUR", 0.001, true, 4.1)]
+        [InlineData(3.5, "USD", 0.001, false)]
+        [InlineData(3.6, "USD", 0.001, true)]
+        [InlineData(3.501, "USD", 0.001, false)]
+        [InlineData(3.501, "USD", 0.01, false)]
+        [InlineData(4, "EUR", 0.001, false)]
+        [InlineData(4.1, "EUR", 0.001, true)]
 
-        public void Apply_RateChange_ReturnNewRate(decimal newRate, string code, decimal threshold, bool isChanged, decimal rateAfterChange)
+        public void Apply_RateChange_ReturnNewRate(decimal newRate, string code, decimal threshold, bool isChanged)
         {
             var options = Options.Create(new RateWatcherOptions { ValueChangeThreshold = threshold });
             var rateChangeDetector = InitTestData(options);
@@ -45,8 +45,8 @@ namespace RateWatcher.Tests
                     mid = newRate
                 }]
             };
-            var result = rateChangeDetector.CheckRateChange(newNBPData);
-            Assert.Equal((isChanged, code, rateAfterChange), result);
+            var result = rateChangeDetector.IsRateChange(newNBPData);
+            Assert.Equal(isChanged, result);
         }
 
 
@@ -62,7 +62,7 @@ namespace RateWatcher.Tests
                     mid = initValue
                 }]
             };
-            rateChangeDetector.CheckRateChange(nbpDataUSD);
+            rateChangeDetector.IsRateChange(nbpDataUSD);
 
             var nbpDataEUR = new NBPData()
             {
@@ -72,7 +72,7 @@ namespace RateWatcher.Tests
                     mid = initValue + 0.5m
                 }]
             };
-            rateChangeDetector.CheckRateChange(nbpDataEUR);
+            rateChangeDetector.IsRateChange(nbpDataEUR);
 
             var nbpDataCHF = new NBPData()
             {
@@ -82,7 +82,7 @@ namespace RateWatcher.Tests
                     mid = initValue + 1m
                 }]
             };
-            rateChangeDetector.CheckRateChange(nbpDataCHF);
+            rateChangeDetector.IsRateChange(nbpDataCHF);
 
             return rateChangeDetector;
         }
