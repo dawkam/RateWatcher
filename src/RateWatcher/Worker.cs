@@ -7,17 +7,24 @@ namespace RateWatcher
         protected override async Task ExecuteAsync(CancellationToken cancellationToken)
         {
             var optionsCopy = options.Value;
-            var lastRates = await fileRateController.GetNewestRate(cancellationToken);
-            rateChangeDetector.InitLastRates(lastRates);
+            try
+            {
+                var lastRates = await fileRateController.GetNewestRate(cancellationToken);
+                rateChangeDetector.InitLastRates(lastRates);
+            }
+            catch (IOException e)
+            {
+                logger.LogError(e.Message);
+            }
 
             while (!cancellationToken.IsCancellationRequested)
             {
-                try
-                {
-                    var scope = seriveScope.CreateAsyncScope();
+                await using var scope = seriveScope.CreateAsyncScope();
 
-                    var nbp = scope.ServiceProvider.GetRequiredService<NBPClient>();
-                    foreach (var currency in options.Value.Currency)
+                var nbp = scope.ServiceProvider.GetRequiredService<NBPClient>();
+                foreach (var currency in options.Value.Currency)
+                {
+                    try
                     {
                         var data = await nbp.GetCurrentRate(currency, cancellationToken);
                         if (data != null)
@@ -29,10 +36,10 @@ namespace RateWatcher
                             }
                         }
                     }
-                }
-                catch (Exception e)
-                {
-                    logger.LogError(e.Message);
+                    catch (HttpRequestException e)
+                    {
+                        logger.LogError(e.Message);
+                    }
                 }
                 await Task.Delay(optionsCopy.RefreshInterval, cancellationToken);
             }
