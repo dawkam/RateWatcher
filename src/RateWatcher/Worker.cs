@@ -7,8 +7,15 @@ namespace RateWatcher
         protected override async Task ExecuteAsync(CancellationToken cancellationToken)
         {
             var optionsCopy = options.Value;
-            var lastRates = await fileRateController.GetNewestRate(cancellationToken);
-            rateChangeDetector.InitLastRates(lastRates);
+            try
+            {
+                var lastRates = await fileRateController.GetNewestRate(cancellationToken);
+                rateChangeDetector.InitLastRates(lastRates);
+            }
+            catch (Exception e) when (!cancellationToken.IsCancellationRequested)
+            {
+                logger.LogError(e, "Failed to open file");
+            }
 
             while (!cancellationToken.IsCancellationRequested)
             {
