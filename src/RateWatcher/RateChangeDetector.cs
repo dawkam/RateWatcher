@@ -5,11 +5,15 @@ namespace RateWatcher
 
     public class RateChangeDetector(IOptions<RateWatcherOptions> options)
     {
-        Dictionary<string, decimal> currentRate = [];
+        private readonly Dictionary<string, decimal> currentRate = [];
 
         public void InitLastRates(Dictionary<string, decimal> lastRates)
         {
-            this.currentRate = lastRates;
+            this.currentRate.Clear();
+            foreach (var rate in lastRates)
+            {
+                currentRate.Add(rate.Key, rate.Value);
+            }
         }
 
         public bool IsRateChange(NBPData data)
