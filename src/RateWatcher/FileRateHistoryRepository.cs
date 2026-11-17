@@ -4,9 +4,8 @@ using System.Text;
 
 namespace RateWatcher
 {
-    public class FileRateController(IOptions<RateWatcherOptions> options, ILogger<Worker> logger)
+    public class FileRateHistoryRepository(IOptions<RateWatcherOptions> options, ILogger<Worker> logger)
     {
-
         private const string Header = "Code,Value,AddedOn";
         private const string DateFormat = "yyyy-MM-dd";
         private static readonly CultureInfo Invariant = CultureInfo.InvariantCulture;

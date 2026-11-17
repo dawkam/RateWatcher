@@ -2,7 +2,7 @@ using Microsoft.Extensions.Options;
 
 namespace RateWatcher
 {
-    public class Worker(IOptions<RateWatcherOptions> options, IServiceScopeFactory seriveScope, ILogger<Worker> logger, FileRateController fileRateController, RateChangeDetector rateChangeDetector) : BackgroundService
+    public class Worker(IOptions<RateWatcherOptions> options, IServiceScopeFactory seriveScope, ILogger<Worker> logger, FileRateHistoryRepository fileRateController, RateChangeDetector rateChangeDetector) : BackgroundService
     {
         protected override async Task ExecuteAsync(CancellationToken cancellationToken)
         {
