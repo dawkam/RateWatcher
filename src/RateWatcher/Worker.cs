@@ -10,7 +10,6 @@ namespace RateWatcher
             var lastRates = await fileRateController.GetNewestRate(cancellationToken);
             rateChangeDetector.InitLastRates(lastRates);
 
-
             while (!cancellationToken.IsCancellationRequested)
             {
                 await using var scope = seriveScope.CreateAsyncScope();
@@ -28,7 +27,6 @@ namespace RateWatcher
                                 this.PintRate(data.code, data.rates[0].mid);
 
                                 await fileRateController.SaveNewRateAsync(data.code, data.rates[0].mid, data.rates[0].effectiveDate, cancellationToken);
-
                             }
                         }
                         await Task.Delay(optionsCopy.RefreshInterval, cancellationToken);
@@ -43,7 +41,6 @@ namespace RateWatcher
 
         private void PintRate(string currencyCode, decimal currencyValue)
         {
-
             try
             {
                 logger.LogInformation(message: $"{currencyCode}:{currencyValue}");
