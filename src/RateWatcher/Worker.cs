@@ -29,12 +29,12 @@ namespace RateWatcher
                                 await fileRateController.SaveNewRateAsync(data.code, data.rates[0].mid, data.rates[0].effectiveDate, cancellationToken);
                             }
                         }
-                        await Task.Delay(optionsCopy.RefreshInterval, cancellationToken);
                     }
                     catch (Exception e) when (!cancellationToken.IsCancellationRequested)
                     {
-                        logger.LogError($"Error in {currency} {e.Message}");
+                        logger.LogError(e, "Failed to process rate for {Currency}", currency);
                     }
+                    await Task.Delay(optionsCopy.RefreshInterval, cancellationToken);
                 }
             }
         }
