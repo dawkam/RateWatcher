@@ -43,7 +43,7 @@ namespace RateWatcher
 
                 if (fileData.TryGetValue(columns[0], out var data))
                 {
-                    fileData[columns[0]].AddRange(data);
+                    fileData[columns[0]].Add((value, addedOn));
                 }
                 else
                 {

@@ -3,43 +3,37 @@
 namespace RateWatcher
 {
 
-    public class RateChangeDetector(IOptions<RateWatcherOptions> options, IServiceScopeFactory seriveScope, FileRateController fileRateController, TimeProvider timeProvider)
+    public class RateChangeDetector(IOptions<RateWatcherOptions> options)
     {
         Dictionary<string, decimal> currentRate = [];
 
-        public async Task<(bool, string, decimal)> CheckRateChange(NBPData data, CancellationToken cancellationToken)
+        public void InitLastRates(Dictionary<string, decimal> lastRates)
+        {
+            this.currentRate = lastRates;
+        }
+
+        public bool IsRateChange(NBPData data)
         {
             decimal newValue = data.rates[0].mid;
             var optionsCopy = options.Value;
-            var result = (false, data.code, 0m);
-
-            if (currentRate.Count == 0)
-            {
-                currentRate = await fileRateController.GetNewestRate(cancellationToken);
-            }
-
+            var result = false;
 
             if (!currentRate.TryGetValue(data.code, out decimal currentValue))
             {
                 currentRate.Add(data.code, newValue);
-                result = (true, data.code, newValue);
-                var date = DateOnly.FromDateTime(timeProvider.GetUtcNow().UtcDateTime);
-                await fileRateController.SaveNewRateAsync(data.code, newValue, date, cancellationToken);
+                result = true;
 
             }
-            else if (IsChangeDetected(currentValue, newValue, optionsCopy.ValueChangeThreshold))
+            else if (IsRateReachThreshold(currentValue, newValue, optionsCopy.ValueChangeThreshold))
             {
                 currentRate[data.code] = newValue;
-                result = (true, data.code, newValue);
-                var date = DateOnly.FromDateTime(timeProvider.GetUtcNow().UtcDateTime);
-                await fileRateController.SaveNewRateAsync(data.code, newValue, date, cancellationToken);
-
+                result = true;
             }
 
             return result;
         }
 
-        private bool IsChangeDetected(decimal currentRate, decimal newRate, decimal threshold)
+        private bool IsRateReachThreshold(decimal currentRate, decimal newRate, decimal threshold)
         {
             return Math.Abs(currentRate - newRate) > threshold;
         }

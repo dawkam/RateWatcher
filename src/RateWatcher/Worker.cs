@@ -9,18 +9,21 @@ namespace RateWatcher
             var optionsCopy = options.Value;
             while (!cancellationToken.IsCancellationRequested)
             {
-                var scope = seriveScope.CreateScope();
+                var scope = seriveScope.CreateAsyncScope();
                 var rateChangeDetector = scope.ServiceProvider.GetRequiredService<RateChangeDetector>();
+                var fileRateController = scope.ServiceProvider.GetRequiredService<FileRateController>();
+                var lastRates = await fileRateController.GetNewestRate(cancellationToken);
+                rateChangeDetector.InitLastRates(lastRates);
+
                 var nbp = scope.ServiceProvider.GetRequiredService<NBPClient>();
                 foreach (var currency in options.Value.Currency)
                 {
                     var data = await nbp.GetCurrentRate(currency, cancellationToken);
                     if (data != null)
                     {
-                        (bool isChanged, string code, decimal value) = await rateChangeDetector.CheckRateChange(data, cancellationToken);
-                        if (isChanged)
+                        if (rateChangeDetector.IsRateChange(data))
                         {
-                            this.PintRate(code, value);
+                            this.PintRate(data.code, data.rates[0].mid);
                         }
                     }
                 }
